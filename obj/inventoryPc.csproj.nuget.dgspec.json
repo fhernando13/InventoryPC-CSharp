@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\inventoryPc.csproj": {}
+    "C:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\inventoryPc.csproj": {}
   },
   "projects": {
-    "c:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\inventoryPc.csproj": {
+    "C:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\inventoryPc.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\inventoryPc.csproj",
+        "projectUniqueName": "C:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\inventoryPc.csproj",
         "projectName": "inventoryPc",
-        "projectPath": "c:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\inventoryPc.csproj",
+        "projectPath": "C:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\inventoryPc.csproj",
         "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\obj\\",
+        "outputPath": "C:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

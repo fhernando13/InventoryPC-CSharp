@@ -1,4 +1,5 @@
 ﻿
+using System.ComponentModel;
 using System.Data.SqlClient;
 using System.Management;
 using System.Runtime.Versioning;
@@ -7,8 +8,8 @@ namespace pcinfo4
 {
     [SupportedOSPlatform("windows")]
     class conexiondb
-    {        
-        string chainConexion = "Data Source=.;user id=sa;password=<YourStrong@Passw0rd>;Initial Catalog=test";
+    {
+        string chainConexion = "Data Source=.;user id=sa;password=<YourStrong@Passw0rd>;Initial Catalog=pcinfo";
         public SqlConnection conn = new SqlConnection();
 
         public conexiondb()
@@ -38,28 +39,24 @@ namespace pcinfo4
 
         static void pcData()
         {
-            string serialMB = string.Empty;
-            string manufacurerMB = string.Empty;
-            string productMB = string.Empty;
+            string? serialMB = "";
+            string? manufacurerMB ="";
+            string? productMB = "";
 
-            string nameSO = string.Empty;
-            string archSO = string.Empty;
-            string organizationSO = string.Empty;
-            string versionSO = string.Empty;
-            string serialNumberSO = string.Empty;
+            string? nameSO = "";
+            string? archSO = "";
+            string? organizationSO = "";
+            string? versionSO = "";
+            string? serialNumberSO = "";
+            
+            string? sizeStorage = "";
+            string? machineName = "";
+            string? modelSdd = "";
+            string? numberSerialSdd = "";
 
-            string sizeStorage = string.Empty;
-            string BrandStorage = string.Empty;
-            string modelStorage = string.Empty;
-            string serialNumberStorage = string.Empty;
-
-            string machineName = string.Empty;
-            string modelSdd = string.Empty;
-            string numberSerialSdd = string.Empty;
-
-            string memoryRam = string.Empty;
-            string brandRam = string.Empty;
-            string numberSerialRam  = string.Empty;
+            string? memoryRam = "";
+            string? brandRam = "";
+            string? numberSerialRam  = "";
 
             //MotherBoard
             ManagementObjectSearcher mos = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BaseBoard");
@@ -71,8 +68,10 @@ namespace pcinfo4
                     manufacurerMB = mo.GetPropertyValue("Manufacturer").ToString();
                     productMB =  mo.GetPropertyValue("Product").ToString();
                 }
-                catch
-                { }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error:"+e.Message);
+                }
             }
 
             //S.O.
@@ -87,22 +86,31 @@ namespace pcinfo4
                     archSO = sys.GetPropertyValue("OSArchitecture").ToString();
                     serialNumberSO = sys.GetPropertyValue("SerialNumber").ToString();
                 }
-                catch
-                { }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error:"+e.Message);
+                }
             }
 
             //SDDinfo
             ManagementObjectSearcher disks = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_DiskDrive");
-            
-            foreach (ManagementObject disk in disks.Get())
-            {                
-                machineName = disk.GetPropertyValue("SystemName").ToString();
-                modelSdd = disk.GetPropertyValue("Model").ToString();
-                numberSerialSdd = disk.GetPropertyValue("SerialNumber").ToString();
 
-                long hddSizeBytes = Int64.Parse(disk["Size"].ToString());
-                double hddSizeGBytes = hddSizeBytes / 1024 / 1024 / 1024;
-                sizeStorage = (hddSizeGBytes + " GB");               
+            foreach (ManagementObject disk in disks.Get())
+            {
+                try
+                {
+                    machineName = disk.GetPropertyValue("SystemName").ToString();
+                    modelSdd = disk.GetPropertyValue("Model").ToString();
+                    numberSerialSdd = disk.GetPropertyValue("SerialNumber").ToString();                    
+                    long? hddSizeBytes = Int64.Parse(disk["Size"].ToString());
+                    sizeStorage = hddSizeBytes / 1024 / 1024 / 1024+" GB";
+                    
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error: "+e.Message);
+                }
+                
             }
 
             //Processor
@@ -118,8 +126,10 @@ namespace pcinfo4
                     Console.WriteLine(pro.GetPropertyValue("Role").ToString());
                     Console.WriteLine("");
                 }
-                catch
-                { }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error:"+e.Message);
+                }
             }
 
             //Processor
@@ -127,42 +137,52 @@ namespace pcinfo4
             foreach (ManagementObject key in keys.Get())
             {
                 try
-                {                    
-                    Console.WriteLine(key.GetPropertyValue("OA3xOriginalProductKey").ToString());                    
+                {
+                    Console.WriteLine(key.GetPropertyValue("OA3xOriginalProductKey").ToString());
                     Console.WriteLine("");
                 }
-                catch
-                { }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error:"+e.Message);
+                }
             }
 
             //RAM
             ManagementObjectSearcher rams = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_PhysicalMemory");
             foreach (ManagementObject ram in rams.Get())
             {
+                try
+                {
                 var capacity = Convert.ToUInt64(ram.Properties["Capacity"].Value);
                 var capacityKB = capacity / 1024;
                 var capacityMB = capacityKB / 1024;
                 memoryRam = (capacityMB + "MB");
                 brandRam = ram.GetPropertyValue("Manufacturer").ToString();
                 numberSerialRam = ram.GetPropertyValue("SerialNumber").ToString();
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error:"+e.Message);
+                }
 
                 Console.WriteLine(memoryRam);
                 Console.WriteLine(brandRam);
                 Console.WriteLine(numberSerialRam);
+                Console.WriteLine("");
             }
 
             Console.WriteLine("");
 
             Console.WriteLine(machineName);
 
-            Console.WriteLine(manufacurerMB);
+            Console.WriteLine("motherboard "+manufacurerMB);
             Console.WriteLine(serialMB);
-            Console.WriteLine(productMB);            
+            Console.WriteLine(productMB);
             Console.WriteLine("");
 
             Console.WriteLine(organizationSO);
             Console.WriteLine(nameSO);
-            Console.WriteLine(versionSO);            
+            Console.WriteLine(versionSO);
             Console.WriteLine(archSO);
             Console.WriteLine(serialNumberSO);
             Console.WriteLine("");
@@ -170,8 +190,6 @@ namespace pcinfo4
             Console.WriteLine(modelSdd);
             Console.WriteLine(sizeStorage);
             Console.WriteLine(numberSerialSdd);
-                       
-
         }
 
         static void insertData()

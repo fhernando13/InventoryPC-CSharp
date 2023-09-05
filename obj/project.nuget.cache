@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "fCQCu697r5hYHexumIDKWQayCzmauSvIpQCP08w8zC9Z/YpRLD0lRXRuOn5wv4TZ01k9WaGJcel4dn95OHb9hQ==",
+  "dgSpecHash": "W8eixNNCXY2Euk2SdKXMQEQGVGd45tw7G3F+oq91Hekxu/qKRUva8fGMqqPrmXqZq1A3GoAYRsXDieoewmQb/g==",
   "success": true,
-  "projectFilePath": "c:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\inventoryPc.csproj",
+  "projectFilePath": "C:\\Users\\ADMIN\\Documents\\cs11dotnet7\\inventoryPc\\inventoryPc.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
