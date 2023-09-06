@@ -39,6 +39,8 @@ namespace pcinfo4
 
         static void pcData()
         {
+            int counter = 0;
+            int counterssd = 0;
             string? serialMB = "";
             string? manufacurerMB ="";
             string? productMB = "";
@@ -54,9 +56,19 @@ namespace pcinfo4
             string? modelSdd = "";
             string? numberSerialSdd = "";
 
-            string? memoryRam = "";
+            string? keyPc = "";
+            
             string? brandRam = "";
             string? numberSerialRam  = "";
+
+            string? NamePro = "";
+            string? Manufacturer = "";
+            string? NumberOfCores = "";
+            string? ProcessorId = "";
+            string? Role = "";
+
+
+
 
             //MotherBoard
             ManagementObjectSearcher mos = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BaseBoard");
@@ -94,23 +106,24 @@ namespace pcinfo4
 
             //SDDinfo
             ManagementObjectSearcher disks = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_DiskDrive");
+            Dictionary<string, string> ssds = new Dictionary<string, string>()
+            {
+
+            };
 
             foreach (ManagementObject disk in disks.Get())
-            {
-                try
-                {
-                    machineName = disk.GetPropertyValue("SystemName").ToString();
-                    modelSdd = disk.GetPropertyValue("Model").ToString();
-                    numberSerialSdd = disk.GetPropertyValue("SerialNumber").ToString();                    
-                    long? hddSizeBytes = Int64.Parse(disk["Size"].ToString());
-                    sizeStorage = hddSizeBytes / 1024 / 1024 / 1024+" GB";
-                    
-                }
-                catch(Exception e)
-                {
-                    Console.WriteLine("Error: "+e.Message);
-                }
-                
+            {           
+                counterssd = counterssd +1; 
+                machineName = disk.GetPropertyValue("SystemName").ToString();
+                modelSdd = disk.GetPropertyValue("Model").ToString();
+                numberSerialSdd = disk.GetPropertyValue("SerialNumber").ToString();                    
+                long? hddSizeBytes = Int64.Parse(disk["Size"].ToString());
+                sizeStorage = hddSizeBytes / 1024 / 1024 / 1024+" GB"; 
+
+                ssds.Add($"Model storage {counterssd}",modelSdd);
+                ssds.Add($"Size storage {counterssd}",sizeStorage);
+                ssds.Add($"Number serie storage {counterssd}",numberSerialSdd);
+
             }
 
             //Processor
@@ -119,12 +132,11 @@ namespace pcinfo4
             {
                 try
                 {
-                    Console.WriteLine(pro.GetPropertyValue("Name").ToString());
-                    Console.WriteLine(pro.GetPropertyValue("Manufacturer").ToString());
-                    Console.WriteLine(pro.GetPropertyValue("NumberOfCores").ToString());
-                    Console.WriteLine(pro.GetPropertyValue("ProcessorId").ToString());
-                    Console.WriteLine(pro.GetPropertyValue("Role").ToString());
-                    Console.WriteLine("");
+                    NamePro = pro.GetPropertyValue("Name").ToString();
+                    Manufacturer = pro.GetPropertyValue("Manufacturer").ToString();
+                    NumberOfCores = pro.GetPropertyValue("NumberOfCores").ToString();
+                    ProcessorId = pro.GetPropertyValue("ProcessorId").ToString();
+                    Role = pro.GetPropertyValue("Role").ToString();                    
                 }
                 catch(Exception e)
                 {
@@ -132,14 +144,13 @@ namespace pcinfo4
                 }
             }
 
-            //Processor
+            //Key Pc
             ManagementObjectSearcher keys = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM SoftwareLicensingService ");
             foreach (ManagementObject key in keys.Get())
             {
                 try
                 {
-                    Console.WriteLine(key.GetPropertyValue("OA3xOriginalProductKey").ToString());
-                    Console.WriteLine("");
+                    keyPc = key.GetPropertyValue("OA3xOriginalProductKey").ToString();                    
                 }
                 catch(Exception e)
                 {
@@ -149,60 +160,113 @@ namespace pcinfo4
 
             //RAM
             ManagementObjectSearcher rams = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_PhysicalMemory");
+            Dictionary<string, string> Slots = new Dictionary<string, string>()
+            {
+                {"Brand memory 1", "void"},
+                {"Number serial 1", "void"},
+                {"Slot 1 capacity MB", "0"},
+                {"Brand memory 2", "void"},
+                {"Number serial 2", "void"},
+                {"Slot 2 capacity MB", "0"},
+                {"Brand memory 3", "void"},
+                {"Number serial 3", "void"},
+                {"Slot 3 capacity MB", "0"},
+                {"Brand memory 4", "void"},
+                {"Number serial 4", "void"},
+                {"Slot 4 capacity MB", "0"},
+            };
             foreach (ManagementObject ram in rams.Get())
             {
                 try
                 {
-                var capacity = Convert.ToUInt64(ram.Properties["Capacity"].Value);
-                var capacityKB = capacity / 1024;
-                var capacityMB = capacityKB / 1024;
-                memoryRam = (capacityMB + "MB");
-                brandRam = ram.GetPropertyValue("Manufacturer").ToString();
-                numberSerialRam = ram.GetPropertyValue("SerialNumber").ToString();
+                    counter = counter +1;
+                    var capacity = Convert.ToUInt64(ram.Properties["Capacity"].Value);
+                    // var capacityKB = capacity / 1024;
+                    var capacityMB = capacity / 1024 /1024;
+
+                    brandRam = ram.GetPropertyValue("Manufacturer").ToString();
+                    numberSerialRam = ram.GetPropertyValue("SerialNumber").ToString();
+
+                    //Brand
+                    if(Slots.ContainsKey($"Brand memory {counter}"))        
+                        Slots[$"Brand memory {counter}"] = brandRam; 
+                    if(Slots.ContainsKey($"Brand memory {counter}"))        
+                        Slots[$"Brand memory {counter}"] = brandRam; 
+                    if(Slots.ContainsKey($"Brand memory {counter}"))        
+                        Slots[$"Brand memory {counter}"] = brandRam;
+                    if(Slots.ContainsKey($"Brand memory {counter}"))        
+                        Slots[$"Brand memory {counter}"] = brandRam;
+                    //NO. Serie
+                    if(Slots.ContainsKey($"Number serial {counter}"))        
+                        Slots[$"Number serial {counter}"] = numberSerialRam;
+                    if(Slots.ContainsKey($"Number serial {counter}"))        
+                        Slots[$"Number serial {counter}"] = numberSerialRam;
+                    if(Slots.ContainsKey($"Number serial {counter}"))        
+                        Slots[$"Number serial {counter}"] = numberSerialRam;
+                    if(Slots.ContainsKey($"Number serial {counter}"))        
+                        Slots[$"Number serial {counter}"] = numberSerialRam;
+                    //Capacity
+                    if(Slots.ContainsKey($"Slot {counter} capacityMB"))        
+                        Slots[$"Slot {counter} capacityMB"] = capacityMB.ToString();
+                    if(Slots.ContainsKey($"Slot {counter} capacityMB"))        
+                        Slots[$"Slot {counter} capacityMB"] = capacityMB.ToString();
+                    if(Slots.ContainsKey($"Slot {counter} capacityMB"))        
+                        Slots[$"Slot {counter} capacityMB"] = capacityMB.ToString();
+                    if(Slots.ContainsKey($"Slot {counter} capacityMB"))        
+                        Slots[$"Slot {counter} capacityMB"] = capacityMB.ToString();
+
                 }
                 catch(Exception e)
                 {
                     Console.WriteLine("Error:"+e.Message);
                 }
+            }    
+                                                                     
 
-                Console.WriteLine(memoryRam);
-                Console.WriteLine(brandRam);
-                Console.WriteLine(numberSerialRam);
-                Console.WriteLine("");
+            Console.WriteLine("Name machine: "+machineName);
+            Console.WriteLine("\n*** Description MotherBoard ***");
+            Console.WriteLine("Brand: "+manufacurerMB);
+            Console.WriteLine("Number serie: "+serialMB);
+            Console.WriteLine("Model: "+productMB);
+            Console.WriteLine("\n*** Description S.O. ***");
+            Console.WriteLine("Corporation: "+organizationSO);
+            Console.WriteLine("NameS.O.: "+nameSO);
+            Console.WriteLine("Version S.O.: "+versionSO);
+            Console.WriteLine("Architecture: "+archSO);
+            Console.WriteLine("Number serie S.O.: "+serialNumberSO);
+            Console.WriteLine("Key activation: "+keyPc);
+            Console.WriteLine("\n*** Description Processor ***");
+            Console.WriteLine("Nme processor: "+NamePro);
+            Console.WriteLine("Brand processor: "+Manufacturer);
+            Console.WriteLine("Number cores: "+NumberOfCores);
+            Console.WriteLine("Id processor: "+ProcessorId);
+            Console.WriteLine("Role Processor: "+Role);
+            Console.WriteLine("\n*** Description SSD ***");
+            Console.WriteLine(ssds["Model storage 1"]);
+            Console.WriteLine(ssds["Size storage 1"]);
+            Console.WriteLine(ssds["Number serie storage 1"]);
+            Console.WriteLine("\n*** Description RAM ***");
+            foreach(var slot in Slots)
+            {
+                Console.WriteLine("{0} : {1}",slot.Key,slot.Value);                                    
             }
 
-            Console.WriteLine("");
-
-            Console.WriteLine(machineName);
-
-            Console.WriteLine("motherboard "+manufacurerMB);
-            Console.WriteLine(serialMB);
-            Console.WriteLine(productMB);
-            Console.WriteLine("");
-
-            Console.WriteLine(organizationSO);
-            Console.WriteLine(nameSO);
-            Console.WriteLine(versionSO);
-            Console.WriteLine(archSO);
-            Console.WriteLine(serialNumberSO);
-            Console.WriteLine("");
-
-            Console.WriteLine(modelSdd);
-            Console.WriteLine(sizeStorage);
-            Console.WriteLine(numberSerialSdd);
+            
         }
 
         static void insertData()
         {
             conexiondb conexion = new conexiondb();
             conexion.openConn();
+            //insert pcinfo (name,name,name,name,name) in (1,2,3,4,5);
             conexion.closeConn();
             pcData();
         }
 
         static void Main()
         {
-            insertData();
+            // insertData();
+            pcData();
         }
 
     }
