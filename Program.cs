@@ -9,8 +9,9 @@ namespace pcinfo4
     [SupportedOSPlatform("windows")]
     class conexiondb
     {
-        string chainConexion = "Data Source=.;user id=sa;password=<YourStrong@Passw0rd>;Initial Catalog=pcinfo";
+        public string chainConexion = "Data Source=.;user id=sa;password=<YourStrong@Passw0rd>;Initial Catalog=pcinfo";
         public SqlConnection conn = new SqlConnection();
+        public SqlCommand cmd;
 
         public conexiondb()
         {
@@ -67,8 +68,7 @@ namespace pcinfo4
             string? ProcessorId = "";
             string? Role = "";
 
-
-
+            string sql = "";
 
             //MotherBoard
             ManagementObjectSearcher mos = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BaseBoard");
@@ -223,34 +223,48 @@ namespace pcinfo4
             }    
                                                                      
 
-            Console.WriteLine("Name machine: "+machineName);
-            Console.WriteLine("\n*** Description MotherBoard ***");
-            Console.WriteLine("Brand: "+manufacurerMB);
-            Console.WriteLine("Number serie: "+serialMB);
-            Console.WriteLine("Model: "+productMB);
-            Console.WriteLine("\n*** Description S.O. ***");
-            Console.WriteLine("Corporation: "+organizationSO);
-            Console.WriteLine("NameS.O.: "+nameSO);
-            Console.WriteLine("Version S.O.: "+versionSO);
-            Console.WriteLine("Architecture: "+archSO);
-            Console.WriteLine("Number serie S.O.: "+serialNumberSO);
-            Console.WriteLine("Key activation: "+keyPc);
-            Console.WriteLine("\n*** Description Processor ***");
-            Console.WriteLine("Nme processor: "+NamePro);
-            Console.WriteLine("Brand processor: "+Manufacturer);
-            Console.WriteLine("Number cores: "+NumberOfCores);
-            Console.WriteLine("Id processor: "+ProcessorId);
-            Console.WriteLine("Role Processor: "+Role);
-            Console.WriteLine("\n*** Description SSD ***");
-            Console.WriteLine(ssds["Model storage 1"]);
-            Console.WriteLine(ssds["Size storage 1"]);
-            Console.WriteLine(ssds["Number serie storage 1"]);
-            Console.WriteLine("\n*** Description RAM ***");
-            foreach(var slot in Slots)
-            {
-                Console.WriteLine("{0} : {1}",slot.Key,slot.Value);                                    
-            }
+            // Console.WriteLine("Name machine: "+machineName);
+            // Console.WriteLine("\n*** Description MotherBoard ***");
+            // Console.WriteLine("Brand: "+manufacurerMB);
+            // Console.WriteLine("Number serie: "+serialMB);
+            // Console.WriteLine("Model: "+productMB);
+            // Console.WriteLine("\n*** Description S.O. ***");
+            // Console.WriteLine("Corporation: "+organizationSO);
+            // Console.WriteLine("NameS.O.: "+nameSO);
+            // Console.WriteLine("Version S.O.: "+versionSO);
+            // Console.WriteLine("Architecture: "+archSO);
+            // Console.WriteLine("Number serie S.O.: "+serialNumberSO);
+            // Console.WriteLine("Key activation: "+keyPc);
+            // Console.WriteLine("\n*** Description Processor ***");
+            // Console.WriteLine("Nme processor: "+NamePro);
+            // Console.WriteLine("Brand processor: "+Manufacturer);
+            // Console.WriteLine("Number cores: "+NumberOfCores);
+            // Console.WriteLine("Id processor: "+ProcessorId);
+            // Console.WriteLine("Role Processor: "+Role);
+            // Console.WriteLine("\n*** Description SSD ***");
+            // Console.WriteLine(ssds["Model storage 1"]);
+            // Console.WriteLine(ssds["Size storage 1"]);
+            // Console.WriteLine(ssds["Number serie storage 1"]);
+            // Console.WriteLine("\n*** Description RAM ***");
+            // foreach(var slot in Slots)
+            // {
+            //     Console.WriteLine("{0} : {1}",slot.Key,slot.Value);                                    
+            // }
 
+
+            conexiondb conexion = new conexiondb();
+            conexion.openConn();
+            try
+            {
+                conexion.cmd = new SqlCommand($"INSERT INTO dbo.pc( MachineName, BrandMB, ModelMB, NoSerieMB, CorporationSO, NameSO, VersionSO, archSO, NumberSerialSO, KeyActivation, NameProcessor, ManufacturerProcessor, NumberOfCores, RoleProcessor, ProcessorId, ModelSSD, SizeSSD, NumberSerialSSD, SlotOneBrandRam, SlotOneNumberSerialRam, SlotOneStorageRam, SlotTwoBrandRam, SlotTwoNumberSerialRam, SlotTwoStorageRam, SlotTreeBrandRam, SlotTreeNumberSerialRam, SlotTreeStorageRam, SlotFourBrandRam, SlotFourNumberSerialRam, SlotFourStorageRam) VALUES ( '{machineName}', '{manufacurerMB}', '{productMB}', '{serialMB}', '{organizationSO}', '{nameSO}', '{versionSO}', '{archSO}', '{serialNumberSO}', '{keyPc}', '{NamePro}', '{Manufacturer}', '{NumberOfCores}', '{Role}', '{ProcessorId}', '{ssds["Model storage 1"]}', '{ssds["Size storage 1"]}', '{ssds["Number serie storage 1"]}', '{Slots["Brand memory 1"]}', '{Slots["Slot 1 capacity MB"]}', '{Slots["Number serial 1"]}', '{Slots["Brand memory 2"]}', '{Slots["Slot 2 capacity MB"]}', '{Slots["Number serial 2"]}', '{Slots["Brand memory 3"]}', '{Slots["Slot 3 capacity MB"]}', '{Slots["Number serial 3"]}', '{Slots["Brand memory 4"]}', '{Slots["Slot 4 capacity MB"]}', '{Slots["Number serial 4"]}')");
+                 conexion.cmd.ExecuteNonQuery();
+                Console.WriteLine("Registre PC");
+                conexion.closeConn();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Error: "+e.Message);
+            }
             
         }
 
