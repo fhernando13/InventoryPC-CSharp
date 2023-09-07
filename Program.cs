@@ -37,9 +37,8 @@ namespace pcinfo4
             string? NumberOfCores = "";
             string? ProcessorId = "";
             string? Role = "";
-
-            string sql = "";
-
+            int device = 0;
+            
             //MotherBoard
             ManagementObjectSearcher mos = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BaseBoard");
             foreach (ManagementObject mo in mos.Get())
@@ -63,7 +62,7 @@ namespace pcinfo4
                 try
                 {
                     nameSO = sys.GetPropertyValue("Name").ToString();
-                    versionSO = sys.GetPropertyValue("Version").ToString();
+                    //versionSO = sys.GetPropertyValue("Version").ToString();
                     organizationSO = sys.GetPropertyValue("Manufacturer").ToString();//
                     archSO = sys.GetPropertyValue("OSArchitecture").ToString();
                     serialNumberSO = sys.GetPropertyValue("SerialNumber").ToString();
@@ -127,7 +126,6 @@ namespace pcinfo4
                     Console.WriteLine("Error:"+e.Message);
                 }
             }
-
             //RAM
             ManagementObjectSearcher rams = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_PhysicalMemory");
             Dictionary<string, string> Slots = new Dictionary<string, string>()
@@ -190,39 +188,86 @@ namespace pcinfo4
                 {
                     Console.WriteLine("Error:"+e.Message);
                 }
-            }    
-               
+            }      
+            versionSO = Environment.OSVersion.ToString();       
+            DateTime today = DateTime.Now;            
+            string update = today.ToString();
+            int n = 6;
+            update = update.Remove(update.Length - n);
+
+            //Open connection
             SqlConnection conn = new SqlConnection("Data Source=.;user id=sa;password=<YourStrong@Passw0rd>;Initial Catalog=pcinfo");
             conn.Open();
-            try
+
+            //Check device
+            SqlCommand com = new SqlCommand($"SELECT IdMachine FROM dbo.pc where MachineName = '{machineName}'", conn);
+            using(SqlDataReader reader = com.ExecuteReader())
             {
-                SqlCommand cmd = new SqlCommand(@$"INSERT INTO dbo.pc( 
-                                                MachineName, BrandMB, ModelMB, NoSerieMB, 
-                                                CorporationSO, NameSO, VersionSO, archSO, NumberSerialSO, KeyActivation, 
-                                                NameProcessor, ManufacturerProcessor, NumberOfCores, RoleProcessor, ProcessorId, 
-                                                ModelSSD, SizeSSD, NumberSerialSSD, 
-                                                SlotOneBrandRam, SlotOneNumberSerialRam, SlotOneStorageRam, 
-                                                SlotTwoBrandRam, SlotTwoNumberSerialRam, SlotTwoStorageRam, 
-                                                SlotTreeBrandRam, SlotTreeNumberSerialRam, SlotTreeStorageRam, 
-                                                SlotFourBrandRam, SlotFourNumberSerialRam, SlotFourStorageRam) 
-                                                VALUES 
-                                                ( '{machineName}', '{manufacurerMB}', '{productMB}', '{serialMB}', 
-                                                '{organizationSO}', '{nameSO}', '{versionSO}', '{archSO}', '{serialNumberSO}', '{keyPc}', 
-                                                '{NamePro}', '{Manufacturer}', '{NumberOfCores}', '{Role}', '{ProcessorId}', 
-                                                '{ssds["Model storage 1"]}', '{ssds["Size storage 1"]}', '{ssds["Number serie storage 1"]}', 
-                                                '{Slots["Brand memory 1"]}', '{Slots["Slot 1 capacity MB"]}', '{Slots["Number serial 1"]}', 
-                                                '{Slots["Brand memory 2"]}', '{Slots["Slot 2 capacity MB"]}', '{Slots["Number serial 2"]}', 
-                                                '{Slots["Brand memory 3"]}', '{Slots["Slot 3 capacity MB"]}', '{Slots["Number serial 3"]}', 
-                                                '{Slots["Brand memory 4"]}', '{Slots["Slot 4 capacity MB"]}', '{Slots["Number serial 4"]}')", conn);                 
-                cmd.ExecuteNonQuery();
-                Console.WriteLine("Register PC is OK");
-                conn.Close();
+                while (reader.Read()) 
+                {
+                    device = Convert.ToInt32(reader["IdMachine"]);                    
+                }                    
             }
-            catch(Exception e)
+            //Update device
+            if(device != 0)
             {
-                Console.WriteLine("Error: "+e.Message);
+                try
+                {
+                    SqlCommand cmd = new SqlCommand(@$"UPDATE dbo.pc
+                    SET 
+                    MachineName = '{machineName}' , BrandMB = '{manufacurerMB}', ModelMB = '{productMB}', NoSerieMB = '{serialMB}', 
+                    CorporationSO = '{organizationSO}', NameSO = '{nameSO}', VersionSO = '{versionSO}', archSO = '{archSO}', NumberSerialSO = '{serialNumberSO}', KeyActivation = '{keyPc}', 
+                    NameProcessor = '{NamePro}', ManufacturerProcessor = '{Manufacturer}', NumberOfCores = '{NumberOfCores}', RoleProcessor = '{Role}', ProcessorId = '{ProcessorId}', 
+                    ModelSSD = '{ssds["Model storage 1"]}', SizeSSD = '{ssds["Size storage 1"]}', NumberSerialSSD = '{ssds["Number serie storage 1"]}', 
+                    SlotOneBrandRam = '{Slots["Brand memory 1"]}', SlotOneNumberSerialRam = '{Slots["Slot 1 capacity MB"]}', SlotOneStorageRam = '{Slots["Number serial 2"]}', 
+                    SlotTwoBrandRam = '{Slots["Brand memory 2"]}', SlotTwoNumberSerialRam = '{Slots["Slot 2 capacity MB"]}', SlotTwoStorageRam = '{Slots["Number serial 2"]}', 
+                    SlotTreeBrandRam = '{Slots["Brand memory 3"]}', SlotTreeNumberSerialRam = '{Slots["Slot 3 capacity MB"]}', SlotTreeStorageRam = '{Slots["Number serial 3"]}', 
+                    SlotFourBrandRam = '{Slots["Brand memory 4"]}', SlotFourNumberSerialRam = '{Slots["Slot 4 capacity MB"]}', SlotFourStorageRam = '{Slots["Number serial 4"]}',
+                    UpdateAt = '{update}'
+                    WHERE IdMachine = {device}", conn);
+                    cmd.ExecuteNonQuery();
+                    Console.WriteLine("Update PC");
+                    conn.Close();
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error: "+e.Message);
+                }                
             }
-            
+            // Create device
+            else
+            {            
+                try
+                {
+                    SqlCommand cmd = new SqlCommand(@$"INSERT INTO dbo.pc( 
+                    MachineName, BrandMB, ModelMB, NoSerieMB, 
+                    CorporationSO, NameSO, VersionSO, archSO, NumberSerialSO, KeyActivation, 
+                    NameProcessor, ManufacturerProcessor, NumberOfCores, RoleProcessor, ProcessorId, 
+                    ModelSSD, SizeSSD, NumberSerialSSD, 
+                    SlotOneBrandRam, SlotOneNumberSerialRam, SlotOneStorageRam, 
+                    SlotTwoBrandRam, SlotTwoNumberSerialRam, SlotTwoStorageRam, 
+                    SlotTreeBrandRam, SlotTreeNumberSerialRam, SlotTreeStorageRam, 
+                    SlotFourBrandRam, SlotFourNumberSerialRam, SlotFourStorageRam,
+                    CreateAT, UpdateAt) 
+                    VALUES 
+                    ( '{machineName}', '{manufacurerMB}', '{productMB}', '{serialMB}', 
+                    '{organizationSO}', '{nameSO}', '{versionSO}', '{archSO}', '{serialNumberSO}', '{keyPc}', 
+                    '{NamePro}', '{Manufacturer}', '{NumberOfCores}', '{Role}', '{ProcessorId}', 
+                    '{ssds["Model storage 1"]}', '{ssds["Size storage 1"]}', '{ssds["Number serie storage 1"]}', 
+                    '{Slots["Brand memory 1"]}', '{Slots["Slot 1 capacity MB"]}', '{Slots["Number serial 1"]}', 
+                    '{Slots["Brand memory 2"]}', '{Slots["Slot 2 capacity MB"]}', '{Slots["Number serial 2"]}', 
+                    '{Slots["Brand memory 3"]}', '{Slots["Slot 3 capacity MB"]}', '{Slots["Number serial 3"]}', 
+                    '{Slots["Brand memory 4"]}', '{Slots["Slot 4 capacity MB"]}', '{Slots["Number serial 4"]}',
+                    '{update}', '{update}')", conn);                 
+                    cmd.ExecuteNonQuery();
+                    Console.WriteLine("Register PC is OK");
+                    conn.Close();
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error: "+e.Message);
+                }                
+            }            
         }
         
         static void Main()

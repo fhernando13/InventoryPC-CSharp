@@ -4,7 +4,7 @@ create database pcinfo;
 use pcinfo;
 
 CREATE TABLE dbo.pc
-    (IdMachine int PRIMARY KEY NOT NULL,
+    (IdMachine int IDENTITY PRIMARY KEY NOT NULL,
     MachineName varchar(5) NOT NULL,
     BrandMB varchar(25) NOT NULL,
     ModelMB varchar(25) NOT NULL,
@@ -35,8 +35,8 @@ CREATE TABLE dbo.pc
     SlotFourBrandRam varchar(50) NOT NULL,
     SlotFourNumberSerialRam varchar(50) NOT NULL,
     SlotFourStorageRam varchar(50) NOT NULL,
-    createAt datetime,
-    udateDate datetime   
+    CreateAT SmallDateTime,
+    UpdateAt SmallDateTime  
     );
 
 select * from pcinfo;
@@ -44,8 +44,10 @@ select * from pcinfo;
 
 CREATE TABLE dbo.employee
 (
-    Idemployee int PRIMARY KEY NOT NULL,
+    Idemployee int IDENTITY PRIMARY KEY NOT NULL,
     Name VARCHAR (50) NOT NULL,
     Lastname VARCHAR (50) NOT NULL,
-    Age int NOT NULL
+    Age int NOT NULL,
+    CreateAT SmallDateTime,
+    UpdateAt SmallDateTime
 );
