@@ -34,7 +34,9 @@ CREATE TABLE dbo.pc
     SlotTreeStorageRam varchar(50) NOT NULL,
     SlotFourBrandRam varchar(50) NOT NULL,
     SlotFourNumberSerialRam varchar(50) NOT NULL,
-    SlotFourStorageRam varchar(50) NOT NULL    
+    SlotFourStorageRam varchar(50) NOT NULL,
+    createAt datetime,
+    udateDate datetime   
     );
 
 select * from pcinfo;
